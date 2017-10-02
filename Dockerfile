@@ -27,6 +27,14 @@ RUN apt-get -qq update && \
       lib32ncurses5 \
       lib32z1 \
       unzip \
+      qtbase5-dev \
+      qtdeclarative5-dev \
+      wget \
+      qemu-kvm \
+      build-essential \
+      python2.7 \
+      python2.7-dev \
+      yamdi \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN rm -f /etc/ssl/certs/java/cacerts; \
@@ -35,6 +43,17 @@ RUN rm -f /etc/ssl/certs/java/cacerts; \
 RUN curl -s https://dl.google.com/android/repository/sdk-tools-linux-${VERSION_SDK_TOOLS}.zip > /sdk.zip && \
     unzip /sdk.zip -d /sdk && \
     rm -v /sdk.zip
+
+# Used for recording device when running functional tests.
+RUN wget -nv https://pypi.python.org/packages/1e/8e/40c71faa24e19dab555eeb25d6c07efbc503e98b0344f0b4c3131f59947f/vnc2flv-20100207.tar.gz && tar -zxvf vnc2flv-20100207.tar.gz && rm vnc2flv-20100207.tar.gz && \
+    cd vnc2flv-20100207 && ln -s /usr/bin/python2.7 /usr/bin/python && python setup.py install
+
+RUN mkdir /sdk/tools/keymaps && \
+    touch /sdk/tools/keymaps/en-us
+
+RUN mkdir /helpers
+
+COPY wait-for-avd-boot.sh /helpers
 
 RUN mkdir -p $ANDROID_HOME/licenses/ \
   && echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > $ANDROID_HOME/licenses/android-sdk-license \
